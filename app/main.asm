@@ -69,6 +69,8 @@ init:
 main:
 
 		call	#DelaySubRoutine
+        
+		xor.b   #BIT0,&P1OUT ; Toggle red LED
 
 		jmp main
 
@@ -77,31 +79,30 @@ main:
 ; Delay Subroutine
 ;-------------------------------------------------------------------------------
 DelaySubRoutine:
-		mov.w	#10, R4
+		mov.w	#10, R4 ; Set Outer Loop for 10 iterations
 
 DelayOuterLoop:
-		tst.w	R4
-		jz		DelayReturn
-		mov.w	#17483, R5
-		dec.w	R4
-		jmp		DelayInnerLoop
-		jmp		DelayOuterLoop
+		tst.w	R4  ; Check if outer loop has decremented to 0 
+		jz		DelayReturn ; If so, then return
+		mov.w	#17483, R5 ; Set inner loop to 0.1 s
+		dec.w	R4 ; Decrement outer loop
+		jmp		DelayInnerLoop ; Run inner loop (delay by 0.1 seconds)
+		jmp		DelayOuterLoop ; Repeat outer loop
 
 DelayInnerLoop:
-		tst.w 	R5
-		jz		DelayOuterLoop
-		dec.w	R5
-		jmp		DelayInnerLoop
+		tst.w 	R5 ; Check if inner loop is complete
+		jz		DelayOuterLoop ; If complete, return to outer loop
+		dec.w	R5 ; Decrement inner loop
+		jmp		DelayInnerLoop ; Repeat inner loop
 
 DelayReturn:
-		xor.b   #BIT0,&P1OUT
-		ret
+		ret ; Return
 
 ;-------------------------------------------------------------------------------
 ; Interrupt Service Routines
 ;-------------------------------------------------------------------------------
 ISR_TB0_CCR0:
-		xor.b	#BIT6, &P6OUT ; Toggle LED1
+		xor.b	#BIT6, &P6OUT ; Toggle LED2
 		bic.w	#CCIFG, &TB0CCTL0 ; Clear interrupt
 		reti
 
